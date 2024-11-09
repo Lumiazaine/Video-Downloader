@@ -1,0 +1,213 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Descargar Videos</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="icon" href="/static/openwebui-icon.png">
+</head>
+
+<body>
+    <!-- Barra de navegación con el logo -->
+    <nav>
+        <div class="navbar">
+            <a href="http://luna-desktop.ddns.net:3000/" target="_blank">
+                <img src="/static/openwebui-icon.png" alt="OpenWebUI Logo" class="logo">
+            </a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <h1>¿En qué puedo ayudarte?</h1>
+        <div class="input-wrapper">
+            <input type="text" id="url" placeholder="Introduce el enlace del video">
+            <button id="downloadBtn" class="download-button">Descargar</button>
+        </div>
+        
+        <div id="feedback"></div>
+
+        <!-- Botones alineados con mayor espaciado vertical -->
+        <div class="actions">
+            <button id="mp4HighBtn">MP4 Alta Calidad</button>
+            <button id="mp3Btn">MP3 Solo Audio</button>
+            <button id="otherOptionsBtn">Otra opción</button>
+            <button id="historialBtn" onclick="mostrarHistorial()">Historial de Descargas</button>
+        </div>
+
+        <!-- Menú de opciones adicionales, inicialmente oculto -->
+        <div id="otherOptionsMenu" class="hidden">
+            <p>Selecciona un formato de descarga:</p>
+            <button id="optionMP4Low">MP4 Calidad Baja</button>
+            <button id="optionWebM">WebM</button>
+            <button id="optionAudioOnly">Solo Audio</button>
+        </div>
+
+        <!-- Barra de progreso para la descarga -->
+        <div id="progressBarContainer" class="hidden">  <!-- Oculto por defecto -->
+            <div id="progressBar"></div>
+            <div id="progressText">Iniciando descarga...</div>
+        </div>
+
+        <!-- Historial de descargas desplegable -->
+        <div id="historialDescargas" class="hidden">
+            <h2>Historial de Descargas</h2>
+            <div id="historialContenido"></div>
+        </div>
+    </div>
+
+    <script>
+        // Limpiar las selecciones y ocultar el menú de opciones adicionales
+        function limpiarSeleccion() {
+            document.querySelectorAll('.actions button').forEach(button => {
+                button.classList.remove('selected');
+            });
+        }
+
+        // Mostrar/ocultar el historial de descargas
+        function mostrarHistorial() {
+            const url = "/historial";
+            fetch(url).then(response => response.json())
+            .then(data => {
+                let contenido = '';
+                data.forEach(item => {
+                    const { archivo, miniatura, fecha, formato, esAudio } = item;
+                    const icono = esAudio ? "🎵" : `<img src="${miniatura}" alt="miniatura" class="miniatura">`;
+
+                    contenido += `<div class="historial-item">
+                                    <div>${icono}</div>
+                                    <div><a href="/download_file?file=${archivo}" download>Descargar ${archivo}</a></div>
+                                    <div>${fecha}</div>
+                                  </div>`;
+                });
+                document.getElementById("historialContenido").innerHTML = contenido;
+                document.getElementById("historialDescargas").classList.toggle("hidden");
+            });
+        }
+
+        // Detectar si el navegador es Safari
+        function esSafari() {
+            const ua = navigator.userAgent;
+            return ua.includes("Safari") && !ua.includes("Chrome");
+        }
+
+        // Mostrar la barra de progreso cuando se inicie la descarga
+        function mostrarBarraDeProgreso() {
+            const progressBarContainer = document.getElementById("progressBarContainer");
+            const progressBar = document.getElementById("progressBar");
+            const progressText = document.getElementById("progressText");
+
+            progressBarContainer.classList.remove("hidden");
+            progressBar.style.width = "0%";  // Inicializa la barra vacía
+            progressText.innerText = "Iniciando descarga...";
+
+            let progreso = 0;
+            const maxProgreso = 100;
+            const intervalo = setInterval(() => {
+                if (progreso < maxProgreso) {
+                    progreso += 10;
+                    progressBar.style.width = `${progreso}%`;
+                    progressText.innerText = `${progreso}% completado...`;
+                } else {
+                    clearInterval(intervalo);
+                    progressText.innerText = "Descarga completada!";
+                    ocultarBarraDeProgreso();
+                }
+            }, 500); // Simulación de progreso, 5 segundos en total
+        }
+
+        // Ocultar la barra de progreso después de la descarga
+        function ocultarBarraDeProgreso() {
+            setTimeout(() => {
+                document.getElementById("progressBarContainer").classList.add("hidden");
+            }, 1000);  // Oculta después de 1 segundo
+        }
+
+        // Función principal de descarga con barra de progreso visual
+        function descargarVideo(format) {
+            const urlInput = document.getElementById("url");
+            const url = urlInput.value;
+
+            if (!url) {
+                alert("Por favor, introduce un enlace válido.");
+                return;
+            }
+
+            // Limpiar la URL de la barra
+            urlInput.value = "";
+
+            // Mostrar barra de progreso
+            mostrarBarraDeProgreso();
+
+            // Enviar solicitud de descarga
+            fetch("/download", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ video_url: url, format: format })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Descargar directamente sin necesidad de hacer clic en un enlace adicional
+                    const link = document.createElement("a");
+                    link.href = data.downloadUrl;
+                    link.download = '';
+                    link.click();
+
+                    // Ocultar la barra de progreso
+                    ocultarBarraDeProgreso();
+                } else {
+                    document.getElementById("feedback").innerHTML = `<p>Error: ${data.error}</p>`;
+                    ocultarBarraDeProgreso();
+                }
+            });
+        }
+
+        // Lógica de botones
+        document.getElementById("downloadBtn").addEventListener("click", function() {
+            limpiarSeleccion();
+            const formato = esSafari() ? 'apple_best' : 'mp4';
+            descargarVideo(formato);
+        });
+
+        document.getElementById("mp4HighBtn").addEventListener("click", function() {
+            limpiarSeleccion();
+            this.classList.add('selected');
+            const formato = esSafari() ? 'apple_best' : 'mp4';
+            descargarVideo(formato);
+        });
+
+        document.getElementById("mp3Btn").addEventListener("click", function() {
+            limpiarSeleccion();
+            this.classList.add('selected');
+            descargarVideo('audio_only');
+        });
+
+        document.getElementById("otherOptionsBtn").addEventListener("click", function() {
+            limpiarSeleccion();
+            this.classList.add('selected');
+            document.getElementById("otherOptionsMenu").classList.toggle("hidden");
+        });
+
+        document.getElementById("optionMP4Low").addEventListener("click", function() {
+            limpiarSeleccion();
+            descargarVideo('mp4_low');
+        });
+
+        document.getElementById("optionWebM").addEventListener("click", function() {
+            limpiarSeleccion();
+            descargarVideo('webm');
+        });
+
+        document.getElementById("optionAudioOnly").addEventListener("click", function() {
+            limpiarSeleccion();
+            descargarVideo('audio_only');
+        });
+
+    </script>
+
+</body>
+
+</html>

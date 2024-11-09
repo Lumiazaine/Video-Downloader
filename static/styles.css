@@ -1,0 +1,216 @@
+﻿/* Estilo de reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Fondo oscuro y colores principales */
+body {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 0 20px;
+}
+
+/* Barra de navegación */
+.navbar {
+    width: 100%;
+    padding: 15px;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.logo {
+    height: 40px;
+}
+
+/* Contenedor principal, con margen inferior ampliado para espaciado */
+.main-content {
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+    margin-top: 80px; /* Aumenta para bajar los botones */
+}
+
+/* Título */
+h1 {
+    font-size: 26px;
+    margin-bottom: 2rem;
+}
+
+/* Input principal */
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #2e2e2e;
+    border-radius: 30px;
+    padding: 8px 16px;
+    width: 100%;
+}
+
+input {
+    flex-grow: 1;
+    font-size: 16px;
+    background-color: transparent;
+    border: none;
+    color: #ffffff;
+    padding: 8px 12px;
+}
+
+input::placeholder {
+    color: #8b8b8b;
+    font-size: 14px;
+}
+
+/* Botón de descarga y botones principales */
+button.download-button {
+    background-color: #4a4aff;
+    color: white;
+    border-radius: 30px;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+}
+
+button.download-button:hover {
+    background-color: #6666ff;
+}
+
+/* Botón común no seleccionado */
+button {
+    background-color: #333333;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 12px; /* Espaciado adicional */
+}
+
+/* Más espacio vertical entre botone */
+.actions {
+    margin-top: 15px;
+}
+
+button:hover {
+    background-color: #555555;
+}
+
+/* Botón seleccionado (cambia al mismo azul que el botón 'Descargar') */
+button.selected {
+    background-color: #4a4aff;
+    color: #ffffff;
+}
+
+/* Botón de 'Otra opción' predeterminado */
+button#otherOptionsBtn {
+    background-color: #333333;
+}
+
+/* Menú de opciones escondido por defecto */
+.hidden {
+    display: none;
+}
+
+/* Opciones debajo de 'Otra opción', con los mismos estilos */
+#otherOptionsMenu {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+button#optionMP4Low,
+button#optionWebM,
+button#optionAudioOnly {
+    background-color: #333;
+    border-radius: 16px;
+    font-size: 14px;
+    margin: 5px 0;
+    padding: 10px;
+    cursor: pointer;
+}
+
+button#optionMP4Low:hover,
+button#optionWebM:hover,
+button#optionAudioOnly:hover {
+    background-color: #555555;
+}
+
+/* Barra de progreso */
+#progressBarContainer {
+    width: 100%;
+    max-width: 600px;
+    background-color: #2c2c2c;
+    border-radius: 20px;
+    margin-top: 20px;
+}
+
+#progressBar {
+    background-color: #4a4aff;
+    height: 100%;
+    width: 0%;
+    border-radius: 20px;
+    transition: width 0.5s ease;
+}
+
+#progressText {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    text-align: center;
+    line-height: 25px;
+    color: white;
+    font-size: 14px;
+}
+
+/* Feedback de descarga */
+#feedback a {
+    color: #4a4aff;
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 15px;
+    display: inline-block;
+}
+
+#feedback a:hover {
+    text-decoration: underline;
+}
+
+/* Historial de descargas */
+#historialDescargas {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #2e2e2e;
+    color: white;
+    border-radius: 8px;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.historial-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.historial-item img {
+    height: 50px;
+    width: 50px;
+    object-fit: cover;
+}

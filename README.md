@@ -27,7 +27,7 @@ cd Downloader
 
 ```bash
 docker build -t video-downloader-app .
-docker run -d -p 1000:1000 --name video-downloader video-downloader-app
+docker run -d --restart unless-stopped -p 1000:1000 --name video-downloader video-downloader-app
 ```
 
 Una vez hecho, podrás acceder desde http://localhost:1000
